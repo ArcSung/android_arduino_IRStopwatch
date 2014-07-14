@@ -16,10 +16,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -98,9 +102,9 @@ protected void onStart(){
 	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	Threshold = prefs.getInt("Threshold", 150);
 	//DEVICE_ADDRESS = prefs.getString("DEVICE_ADDRESS", "NULL");
-    ConnectThread = new DiscoverConnect();
-    ((DiscoverConnect) ConnectThread).setup(this);
-	ConnectThread.start();
+    //ConnectThread = new DiscoverConnect();
+    //((DiscoverConnect) ConnectThread).setup(this);
+	//ConnectThread.start();
     
     SQLdb = new SQLiteDemoActivity();
 	SQLdb.openDatabase_outside(this);
@@ -123,9 +127,6 @@ protected void onDestroy() {
 		.putInt("Threshold", Threshold)
 		//.putString("DEVICE_ADDRESS", DEVICE_ADDRESS)
 	.commit();
-	((DiscoverConnect) ConnectThread).StopThread();
-	ConnectThread.interrupt();
-	ConnectThread = null;
 	// if you connect in onStart() you must not forget to disconnect when your app is closed
 	Amarino.disconnect(this, DEVICE_ADDRESS);
 	Amarino.disconnect(this, DEVICE_ADDRESS2);
@@ -386,6 +387,20 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data)
 {
     super.onActivityResult(requestCode, resultCode, data);
 }
+
+public boolean onKeyDown(int keyCode, KeyEvent event) 
+{
+       if ((keyCode == KeyEvent.KEYCODE_BACK)) 
+       {   
+   		if(DEVICE_ADDRESS != "NULL")
+			ArdDisconnect(DEVICE_ADDRESS);
+		if(DEVICE_ADDRESS2 != "NULL")
+			ArdDisconnect(DEVICE_ADDRESS2);
+       	MainActivity.this.finish();
+           return true;  
+       }  
+       return super.onKeyDown(keyCode, event);  
+ }
 
 }
 
